@@ -105,7 +105,7 @@ custom_fields:
   field_type: select
   name: Font
   description: The TRMNL font is pixel-sharp on every screen. Google Sans Flex looks softer, but can get a bit fuzzy on black &amp; white screens.
-  default: framework
+  default: google
   options:
   - TRMNL (sharpest): framework
   - Google Sans Flex: google
