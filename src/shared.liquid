@@ -304,6 +304,11 @@ agenda : ≤3 rows  "YYYY-MM-DD~label~date"  (upcoming days that have events)
   /* A little air between time label, title and description */
   .pc-event .content > * + * { margin-top: calc(3px * var(--ui-scale, 1)); }
 
+  /* All-day events: gray bar; date range (multi-day only) below the title */
+  .pc-allday { display: flex; flex-direction: column; gap: calc(2px * var(--ui-scale, 1)); padding: calc(8px * var(--ui-scale, 1)) calc(12px * var(--ui-scale, 1)); border-radius: calc(6px * var(--ui-scale, 1)); }
+  /* 1-bit: dithered gray behind text gets noisy, so use a crisp outline instead */
+  .screen--1bit .pc-allday { background: #fff !important; box-shadow: inset 0 0 0 2px #000; }
+
   /* Agenda area takes the remaining height and never overflows the screen */
   .pc-fill  { flex: 1 1 auto; min-height: 0; overflow: hidden; }
 
@@ -400,16 +405,25 @@ agenda : ≤3 rows  "YYYY-MM-DD~label~date"  (upcoming days that have events)
 
 {% comment %} One event row (framework .item with meta bar) {% endcomment %}
 {% template pc_event %}
-<div class="item pc-event{% if all_day %} item--emphasis-3{% endif %}">
+{% if all_day %}
+<div class="pc-allday bg--gray-75 w--full">
+  <span class="title title--small {{ title_cls }}" data-clamp="{{ clamp | default: 3 }}">{{ event.summary }}</span>
+  {% if range != blank %}
+  <span class="text--small lg:text--base 2bit:text--gray-35 4bit:text--gray-35">{{ range }}</span>
+  {% endif %}
+</div>
+{% else %}
+<div class="item pc-event">
   <div class="meta"></div>
   <div class="content">
-    <span class="text--small lg:text--base 2bit:text--gray-35 4bit:text--gray-35">{% if all_day %}{{ range }}{% else %}{% render "pc_time", hm: event.start, fmt: fmt %}{% if event.end != blank %} – {% render "pc_time", hm: event.end, fmt: fmt %}{% endif %}{% endif %}</span>
+    <span class="text--small lg:text--base 2bit:text--gray-35 4bit:text--gray-35">{% render "pc_time", hm: event.start, fmt: fmt %}{% if event.end != blank %} – {% render "pc_time", hm: event.end, fmt: fmt %}{% endif %}</span>
     <span class="title title--small {{ title_cls }}{% if past %} text--gray-50{% endif %}" data-clamp="{{ clamp | default: 3 }}">{{ event.summary }}</span>
     {% if show_desc and event.description != blank %}
     <span class="description 2bit:text--gray-35 4bit:text--gray-35" data-clamp="1">{{ event.description }}</span>
     {% endif %}
   </div>
 </div>
+{% endif %}
 {% endtemplate %}
 
 
@@ -436,7 +450,7 @@ agenda : ≤3 rows  "YYYY-MM-DD~label~date"  (upcoming days that have events)
             {% assign m2 = l_ts | date: "%-m" | minus: 1 %}
             {% capture range %}{{ s_ts | date: "%-d" }} {{ months_short[m1] }} – {{ l_ts | date: "%-d" }} {{ months_short[m2] }}{% endcapture %}
           {% else %}
-            {% assign range = t_all_day %}
+            {% assign range = "" %}
           {% endif %}
           {% render "pc_event", event: event, all_day: true, range: range, fmt: fmt, accent: accent, past: false, title_cls: title_cls, clamp: clamp, show_desc: false %}
           {% assign shown = shown | plus: 1 %}
