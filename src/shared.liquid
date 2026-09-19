@@ -308,6 +308,8 @@ agenda : ≤3 rows  "YYYY-MM-DD~label~date"  (upcoming days that have events)
   .pc-allday { display: flex; flex-direction: column; gap: calc(2px * var(--ui-scale, 1)); padding: calc(8px * var(--ui-scale, 1)) calc(12px * var(--ui-scale, 1)); border-radius: calc(6px * var(--ui-scale, 1)); }
   /* 1-bit: dithered gray behind text gets noisy, so use a crisp outline instead */
   .screen--1bit .pc-allday { background: #fff !important; box-shadow: inset 0 0 0 2px #000; }
+  /* Consecutive all-day bars sit closer together (the gap to timed events stays as is) */
+  .pc-allday + .pc-allday { margin-top: calc(-8px * var(--ui-scale, 1)); }
 
   /* Agenda area takes the remaining height and never overflows the screen */
   .pc-fill  { flex: 1 1 auto; min-height: 0; overflow: hidden; }
