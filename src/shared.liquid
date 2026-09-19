@@ -419,7 +419,7 @@ agenda : ≤3 rows  "YYYY-MM-DD~label~date"  (upcoming days that have events)
 {% assign shown = 0 %}
 <div class="pc-daycol">
   {% if heading != blank %}
-  <span class="title {{ head_cls }}">{{ heading }}{% if sub != blank %}<span class="pc-dayhead-sub text--gray-45">{{ sub }}</span>{% endif %}</span>
+  <span class="title mb--2 {{ head_cls }}">{{ heading }}{% if sub != blank %}<span class="pc-dayhead-sub text--gray-45">{{ sub }}</span>{% endif %}</span>
   {% endif %}
 
   <div class="{% if flow %}pc-flow w--full{% else %}pc-evlist{% endif %}">
