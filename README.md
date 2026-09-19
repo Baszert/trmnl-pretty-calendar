@@ -12,7 +12,7 @@ The [CalDAV](https://trmnl.com/plugin_settings/new?keyname=caldav) plugin must b
 - **Language:** auto or one of 12 languages (EN, NL, DE, FR, ES, IT, PT, SV, DA, NO, FI, PL)
 - **Accent color:** color for today on color screens
 - **Show calendar items:** next 3 days or only today
-- **Weeks in view:** 1 or 2 (10/20 days on TRMNL X)
+- **Weeks in view:** 1 or 2
 - **Event descriptions** and **font** (TRMNL or Google Sans Flex)
 
 ### Develop locally

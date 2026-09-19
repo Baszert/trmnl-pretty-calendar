@@ -1,3 +1,4 @@
+{% if cfg.show_descriptions == "no" %}{% assign show_desc = false %}{% endif %}
 {% comment %}
 ==================================================================
  Pretty Calendar — shared
@@ -198,8 +199,7 @@
 
 {% comment %}
 ---------- 4. CALENDAR DATA ----------
-days   : 20 rows  "YYYY-MM-DD|day|weekday|month_idx|event_count"
-         (7/14 normally, 10/20 on large landscape screens in the full view)
+days   : 14 rows  "YYYY-MM-DD|day|weekday|month_idx|event_count"  (7 or 14 are shown)
 agenda : ≤3 rows  "YYYY-MM-DD~label~date"  (upcoming days that have events)
 {% endcomment %}
 {% assign day_rows = "" %}
@@ -207,7 +207,7 @@ agenda : ≤3 rows  "YYYY-MM-DD~label~date"  (upcoming days that have events)
 {% assign agenda_n = 0 %}
 {% assign today_count = 0 %}
 
-{% for i in (0..19) %}
+{% for i in (0..13) %}
   {% assign ts = i | times: 86400 | plus: start_ts %}
   {% assign d = ts | date: "%Y-%m-%d" %}
   {% assign d_num = ts | date: "%-d" %}
@@ -246,7 +246,6 @@ agenda : ≤3 rows  "YYYY-MM-DD~label~date"  (upcoming days that have events)
 {% endfor %}
 
 {% assign days = day_rows | split: ";" %}
-{% assign wide_count = day_count | divided_by: 7 | times: 10 %}
 {% assign agenda = agenda_rows | split: ";" %}
 
 
@@ -265,20 +264,17 @@ agenda : ≤3 rows  "YYYY-MM-DD~label~date"  (upcoming days that have events)
   .pc--google .description { font-family: "Google Sans Flex", sans-serif; }
 
   /* Day cell: circle that fills its column up to a max size, so it can never overlap
-     its neighbours (portrait, narrow mashup slots, 10-column TRMNL X grid) */
+     its neighbours (portrait, narrow mashup slots) */
   .pc-day   { width: 100%; max-width: var(--pc-max, calc(56px * var(--ui-scale, 1))); aspect-ratio: 1 / 1; border-radius: 9999px; display: flex; align-items: center; justify-content: center; }
   .pc-size--xl { --pc-max: calc(72px * var(--ui-scale, 1)); }
   .pc-size--md { --pc-max: calc(48px * var(--ui-scale, 1)); }
+  /* Large screens (TRMNL X): bigger circles */
+  .screen--lg .pc-size--xl { --pc-max: calc(100px * var(--ui-scale, 1)); }
+  .screen--lg .pc-size--md { --pc-max: calc(64px * var(--ui-scale, 1)); }
   .pc-dots  { min-height: calc(6px * var(--ui-scale, 1)); }
   .pc-dot   { width: calc(5px * var(--ui-scale, 1)); height: calc(5px * var(--ui-scale, 1)); border-radius: 9999px; }
 
-  /* Wide grid (full view on large landscape screens, e.g. TRMNL X): 10 days per row,
-     weekday shown per cell because rows no longer line up with weeks */
-  .pc-wd, .pc-xtra { display: none !important; }
-  .screen--lg:not(.screen--portrait) .pc-grid--wide .pc-wdrow { display: none !important; }
-  .screen--lg:not(.screen--portrait) .pc-grid--wide .pc-wd    { display: block !important; }
-  .screen--lg:not(.screen--portrait) .pc-grid--wide .pc-xtra  { display: flex !important; }
-  .screen--lg:not(.screen--portrait) .pc-grid--wide .pc-cells { grid-template-columns: repeat(10, minmax(0, 1fr)) !important; }
+
 
   /* Thinner meta bar on event items */
   .pc-event .meta { width: calc(4px * var(--ui-scale, 1)) !important; min-width: calc(4px * var(--ui-scale, 1)) !important; flex: 0 0 auto; }
@@ -343,27 +339,23 @@ agenda : ≤3 rows  "YYYY-MM-DD~label~date"  (upcoming days that have events)
 
 {% comment %} Week grid with weekday labels, today circle and event dots {% endcomment %}
 {% template pc_grid %}
-{% assign total = count %}
-{% if wide %}{% assign total = wide_count %}{% endif %}
-<div class="flex flex--col gap--xsmall w--full{% if wide %} pc-grid--wide{% endif %}{% if narrow %} pc-grid--narrow{% endif %}">
+<div class="flex flex--col gap--xsmall w--full{% if narrow %} pc-grid--narrow{% endif %}">
   <div class="grid grid--cols-7 w--full pc-wdrow">
     {% for label in labels %}
     <div class="flex flex--row flex--center-x w--full">
-      <span class="label label--small 2bit:text--gray-35 4bit:text--gray-35"><span class="pc-lbl-full">{{ label | capitalize }}</span><span class="pc-lbl-short">{{ label | slice: 0, 2 | capitalize }}</span></span>
+      <span class="label label--small lg:label 2bit:text--gray-35 4bit:text--gray-35"><span class="pc-lbl-full">{{ label | capitalize }}</span><span class="pc-lbl-short">{{ label | slice: 0, 2 | capitalize }}</span></span>
     </div>
     {% endfor %}
   </div>
 
   <div class="grid grid--cols-7 gap--xsmall w--full pc-cells">
-    {% for row in days limit: total %}
+    {% for row in days limit: count %}
       {% assign p = row | split: "|" %}
       {% assign d = p[0] %}
-      {% assign wd = p[2] | plus: 0 %}
       {% assign dots = p[4] | plus: 0 %}
       {% if dots > 4 %}{% assign dots = 4 %}{% endif %}
 
-      <div class="flex flex--col flex--center-x gap--xxsmall{% if forloop.index > count %} pc-xtra{% endif %}">
-        <span class="pc-wd label label--small 2bit:text--gray-35 4bit:text--gray-35">{{ days_short[wd] | capitalize }}</span>
+      <div class="flex flex--col flex--center-x gap--xxsmall">
         {% if d == today %}
         <div class="pc-day {{ cell_cls }} bg--{{ accent }} 1bit:bg--black 2bit:bg--black 4bit:bg--black">
           <span class="value {{ num_cls }} text--white">{{ p[1] }}</span>
@@ -397,7 +389,7 @@ agenda : ≤3 rows  "YYYY-MM-DD~label~date"  (upcoming days that have events)
 <div class="item pc-event{% if all_day %} item--emphasis-3{% endif %}">
   <div class="meta"></div>
   <div class="content">
-    <span class="label label--small 2bit:text--gray-35 4bit:text--gray-35">{% if all_day %}{{ range }}{% else %}{% render "pc_time", hm: event.start, fmt: fmt %}{% if event.end != blank %} – {% render "pc_time", hm: event.end, fmt: fmt %}{% endif %}{% endif %}</span>
+    <span class="label label--small lg:label 2bit:text--gray-35 4bit:text--gray-35">{% if all_day %}{{ range }}{% else %}{% render "pc_time", hm: event.start, fmt: fmt %}{% if event.end != blank %} – {% render "pc_time", hm: event.end, fmt: fmt %}{% endif %}{% endif %}</span>
     <span class="title title--small {{ title_cls }}{% if past %} text--gray-50{% endif %}" data-clamp="{{ clamp | default: 3 }}">{{ event.summary }}</span>
     {% if show_desc and event.description != blank %}
     <span class="description 2bit:text--gray-35 4bit:text--gray-35" data-clamp="1">{{ event.description }}</span>
@@ -411,12 +403,12 @@ agenda : ≤3 rows  "YYYY-MM-DD~label~date"  (upcoming days that have events)
 {% template pc_day %}
 {% assign max = max | default: 99 %}
 {% assign shown = 0 %}
-<div class="flex flex--col gap--small w--full">
+<div class="flex flex--col flex--left gap--small w--full">
   {% if heading != blank %}
-  <span class="title {{ head_cls }}">{{ heading }}{% if sub != blank %}<span class="pc-dayhead-sub text--gray-45">{{ sub }}</span>{% endif %}</span>
+  <span class="title {{ head_cls }} w--full text--left">{{ heading }}{% if sub != blank %}<span class="pc-dayhead-sub text--gray-45">{{ sub }}</span>{% endif %}</span>
   {% endif %}
 
-  <div class="{% if flow %}pc-flow{% else %}flex flex--col gap--medium{% endif %}">
+  <div class="{% if flow %}pc-flow{% else %}flex flex--col flex--left gap--medium{% endif %} w--full">
     {% for event in events %}
       {% if event.all_day and shown < max %}
         {% assign s = event.start_full | slice: 0, 10 %}
@@ -484,7 +476,7 @@ agenda : ≤3 rows  "YYYY-MM-DD~label~date"  (upcoming days that have events)
 
 {% comment %} Centered message (empty state / setup hint) {% endcomment %}
 {% template pc_empty %}
-<div class="flex flex--col flex--center-x flex--center-y w--full h--full">
-  <span class="title title--small text--center text--gray-35">{{ text }}</span>
+<div class="flex flex--col flex--left flex--center-y w--full h--full">
+  <span class="title title--small text--left text--gray-35">{{ text }}</span>
 </div>
 {% endtemplate %}
