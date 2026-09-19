@@ -286,6 +286,21 @@ agenda : ≤3 rows  "YYYY-MM-DD~label~date"  (upcoming days that have events)
   /* Agenda day headings: date after the day name, with a real gap */
   .pc-dayhead-sub { margin-left: 0.3em; }
 
+  /* Agenda columns: always top-left, never vertically centered */
+  .pc-agenda-grid { align-items: start; }
+  .pc-daycol, .pc-evlist { display: flex; flex-direction: column; align-items: flex-start; justify-content: flex-start; width: 100%; }
+  .pc-daycol { gap: calc(8px * var(--ui-scale, 1)); }
+  .pc-evlist { gap: calc(14px * var(--ui-scale, 1)); }
+  .pc-daycol .item { width: 100%; }
+
+  /* Full view on large screens (TRMNL X): controlled sizes, keeps the bold title--small weight */
+  .screen--lg .pc-h { font-size: calc(22px * var(--ui-scale, 1)) !important; line-height: 1.2 !important; }
+  .screen--lg .pc-t { font-size: calc(19px * var(--ui-scale, 1)) !important; line-height: 1.25 !important; }
+
+  /* Explicit bold: some title sizes in Framework 3 are regular weight */
+  .pc-bold, .pc-h, .pc-t { font-weight: 700 !important; font-variation-settings: "wght" 700 !important; }
+  .pc-dayhead-sub { font-weight: 400 !important; font-variation-settings: "wght" 400 !important; }
+
   /* A little air between time label, title and description */
   .pc-event .content > * + * { margin-top: calc(3px * var(--ui-scale, 1)); }
 
@@ -326,7 +341,7 @@ agenda : ≤3 rows  "YYYY-MM-DD~label~date"  (upcoming days that have events)
 {% template pc_header %}
 <div class="flex flex--row flex--between flex--center-y w--full">
   <div class="flex flex--row flex--center-y gap--small">
-    <span class="title {{ cls }}">{{ month }}</span>
+    <span class="title pc-bold {{ cls }}">{{ month }}</span>
     <span class="title {{ cls }} text--gray-45">{{ year }}</span>
   </div>
   {% if aside != blank %}
@@ -402,12 +417,12 @@ agenda : ≤3 rows  "YYYY-MM-DD~label~date"  (upcoming days that have events)
 {% template pc_day %}
 {% assign max = max | default: 99 %}
 {% assign shown = 0 %}
-<div class="flex flex--col flex--left gap--small w--full">
+<div class="pc-daycol">
   {% if heading != blank %}
-  <span class="title {{ head_cls }} w--full text--left">{{ heading }}{% if sub != blank %}<span class="pc-dayhead-sub text--gray-45">{{ sub }}</span>{% endif %}</span>
+  <span class="title {{ head_cls }}">{{ heading }}{% if sub != blank %}<span class="pc-dayhead-sub text--gray-45">{{ sub }}</span>{% endif %}</span>
   {% endif %}
 
-  <div class="{% if flow %}pc-flow{% else %}flex flex--col flex--left gap--medium{% endif %} w--full">
+  <div class="{% if flow %}pc-flow w--full{% else %}pc-evlist{% endif %}">
     {% for event in events %}
       {% if event.all_day and shown < max %}
         {% assign s = event.start_full | slice: 0, 10 %}
@@ -459,7 +474,7 @@ agenda : ≤3 rows  "YYYY-MM-DD~label~date"  (upcoming days that have events)
     {% endif %}
   {% else %}
     {% if agenda.size > 0 %}
-    <div class="grid {{ cols_cls }} gap--large w--full">
+    <div class="grid {{ cols_cls }} gap--large w--full pc-agenda-grid">
       {% for row in agenda limit: max_days %}
         {% assign a = row | split: "~" %}
         {% render "pc_day", events: events, date: a[0], heading: a[1], sub: a[2], today: today, now_hm: now_hm, fmt: fmt, accent: accent, months_short: months_short, t_all_day: t_all_day, max: max_items, flow: false, head_cls: head_cls, title_cls: title_cls, clamp: clamp, show_desc: show_desc %}
