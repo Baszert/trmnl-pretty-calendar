@@ -1,4 +1,4 @@
-<div class="layout layout--row portrait:layout--col layout--top layout--left gap--large {{ font_cls }}">
+<div class="layout layout--row portrait:layout--col layout--top layout--left gap--large p--4 {{ font_cls }}">
 {% if cal == blank %}
   {% render "pc_empty", text: t_setup %}
 {% else %}
@@ -10,7 +10,7 @@
 
   <div class="pc-vrule bg--gray-60 1bit:bg--black"></div>
 
-  {% render "pc_agenda", events: cal.events, mode: mode, agenda: agenda, today: today, now_hm: now_hm, today_count: today_count, fmt: time_format, accent: accent, months_short: months_short, t_today: t_today, t_all_day: t_all_day, t_empty_today: t_empty_today, t_empty: t_empty, show_desc: false, cols_cls: "grid--cols-1", max_days: 1, max_items: 3, flow: false, clamp: 1, head_cls: "title--small lg:title", title_cls: "lg:title" %}
+  {% render "pc_agenda", events: cal.events, mode: mode, agenda: agenda, today: today, now_hm: now_hm, today_count: today_count, fmt: time_format, accent: accent, months_short: months_short, t_today: t_today, t_all_day: t_all_day, t_empty_today: t_empty_today, t_empty: t_empty, show_desc: false, cols_cls: "grid--cols-1", max_days: 1, max_items: 3, flow: false, clamp: 1, head_cls: "title--small lg:title--base lg:text--bold", title_cls: "lg:title" %}
 
 {% endif %}
 </div>
