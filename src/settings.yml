@@ -6,10 +6,10 @@ static_data: ''
 polling_verb: get
 framework_version: 3.3.2
 serverless_language: node
-polling_url: ''
-polling_headers: ''
+polling_url: https://usetrmnl.com/api/plugin_settings/{{caldav_id}}/data
+polling_headers: authorization=bearer {{user_token}}
 polling_body: ''
-id: 482081
+id: 210616
 oauth_enabled: 'false'
 oauth_pkce_enabled: 'no'
 oauth_authorize_url: ''
@@ -109,6 +109,6 @@ custom_fields:
   options:
   - TRMNL (sharpest): framework
   - Google Sans Flex: google
-name: "[Copy] Pretty Calendar"
-description: Calendar, but then pretty.
-refresh_interval: 15
+name: Pretty Calendar
+description: Calender, but then pretty.
+refresh_interval: 60
