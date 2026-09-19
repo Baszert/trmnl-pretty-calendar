@@ -1,0 +1,114 @@
+---
+strategy: plugin_merge
+no_screen_padding: 'no'
+dark_mode: 'no'
+static_data: ''
+polling_verb: get
+framework_version: 3.3.2
+serverless_language: node
+polling_url: ''
+polling_headers: ''
+polling_body: ''
+id: 482081
+oauth_enabled: 'false'
+oauth_pkce_enabled: 'no'
+oauth_authorize_url: ''
+oauth_token_url: ''
+oauth_scopes: ''
+oauth_scope_separator: ''
+oauth_refresh_url: ''
+oauth_auth_params: ''
+oauth_token_headers: ''
+oauth_token_site: ''
+oauth_token_params: ''
+oauth_token_request_auth_method: ''
+oauth_body_format: ''
+oauth_token_response_metadata: ''
+oauth_authorization_method: ''
+oauth_refresh_params: ''
+oauth_token_field_name: ''
+oauth_expiry_field_name: ''
+oauth_expiry_strategy: ''
+oauth_fixed_expiry_ms: ''
+custom_fields:
+- keyname: author_bio
+  field_type: author_bio
+  name: About This Plugin
+  description: For this plugin you need to have the <a href="https://usetrmnl.com/plugin_settings/new?keyname=caldav">CalDav</a> calendar plugin active and in a playlist. You can hide it so you only see this one. Select an active CalDav calendar and it's pretty. Works on black &amp; white, grayscale and color screens.
+  category: calendar
+- keyname: calendar_source
+  field_type: plugin_instance_select
+  name: Calendar Source
+  plugin_keyname: caldav
+  description: Select which CalDav plugin you want to use.
+  help_text: Only active CalDav plugins are shown.
+- keyname: language
+  field_type: select
+  name: Language
+  description: Language for day names, months and labels.
+  help_text: Auto uses the language of your TRMNL account (falls back to English).
+  default: auto
+  options:
+  - Auto (account language): auto
+  - English: en
+  - Nederlands: nl
+  - Deutsch: de
+  - Français: fr
+  - Español: es
+  - Italiano: it
+  - Português: pt
+  - Svenska: sv
+  - Dansk: da
+  - Norsk: nb
+  - Suomi: fi
+  - Polski: pl
+- keyname: accent_color
+  field_type: select
+  name: Accent color
+  description: Highlight color for today and all-day events on color screens.
+  help_text: Black &amp; white and grayscale screens always use black, so it stays crisp.
+  default: red
+  options:
+  - Red: red
+  - Orange: orange
+  - Green: green
+  - Blue: blue
+  - Purple: purple
+  - Pink: pink
+  - Black: black
+- keyname: show_calendar_items
+  field_type: select
+  name: Show calendar items
+  description: Show the next 3 days with events, or only today.
+  default: all
+  options:
+  - Today: today
+  - Next 3 days: all
+- keyname: show_weeks
+  field_type: select
+  name: Weeks in view
+  description: How many weeks would you like to see on the screen?
+  help_text: In the quadrant view, 1 week leaves room for your next appointment.
+  default: 7
+  options:
+  - 1 week: 7
+  - 2 weeks: 14
+- keyname: show_descriptions
+  field_type: select
+  name: Show event descriptions
+  description: Show the first line of an event's description below its title.
+  default: 'yes'
+  options:
+  - 'Yes': 'yes'
+  - 'No': 'no'
+- keyname: font
+  field_type: select
+  name: Font
+  description: The TRMNL font is pixel-sharp on every screen. Google Sans Flex looks softer, but can get a bit fuzzy on black &amp; white screens.
+  default: framework
+  options:
+  - TRMNL (sharpest): framework
+  - Google Sans Flex: google
+name: "[Copy] Pretty Calendar"
+description: Calendar, but then pretty.
+refresh_interval: 15

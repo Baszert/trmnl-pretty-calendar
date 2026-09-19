@@ -1,0 +1,490 @@
+{% comment %}
+==================================================================
+ Pretty Calendar — shared
+ 1. Settings         4. Calendar data (days + agenda)
+ 2. Translations     5. Styles
+ 3. Date & time      6. Templates (header, grid, agenda, day, event)
+==================================================================
+{% endcomment %}
+
+
+{% comment %} ---------- 1. SETTINGS ---------- {% endcomment %}
+{% assign cfg = trmnl.plugin_settings.custom_fields_values %}
+{% assign cal = calendar_source %}
+{% assign mode = cfg.show_calendar_items | default: "all" %}
+{% assign day_count = cfg.show_weeks | default: "7" | plus: 0 %}
+{% assign accent = cfg.accent_color | default: "red" %}
+{% assign font = cfg.font | default: "framework" %}
+{% assign show_desc = true %}
+{% if cfg.show_descriptions == "no" %}{% assign show_desc = false %}{% endif %}
+{% assign time_format = cal.time_format | default: "24h" %}
+{% assign first_day = cal.first_day | default: 1 | plus: 0 %}
+
+{% assign font_cls = "" %}
+{% if font == "google" %}{% assign font_cls = "pc--google" %}{% endif %}
+
+{% assign lang = cfg.language | default: "auto" %}
+{% if lang == "auto" %}
+  {% assign lang = trmnl.user.locale | default: "en" | slice: 0, 2 | downcase %}
+{% endif %}
+{% if lang == "no" or lang == "nn" %}{% assign lang = "nb" %}{% endif %}
+
+
+{% comment %} ---------- 2. TRANSLATIONS ---------- {% endcomment %}
+{% case lang %}
+{% when "nl" %}
+  {% assign i18n_days = "zondag,maandag,dinsdag,woensdag,donderdag,vrijdag,zaterdag" %}
+  {% assign i18n_days_short = "zo,ma,di,wo,do,vr,za" %}
+  {% assign i18n_months = "januari,februari,maart,april,mei,juni,juli,augustus,september,oktober,november,december" %}
+  {% assign i18n_months_short = "jan,feb,mrt,apr,mei,jun,jul,aug,sep,okt,nov,dec" %}
+  {% assign t_today = "Vandaag" %}
+  {% assign t_tomorrow = "Morgen" %}
+  {% assign t_all_day = "Hele dag" %}
+  {% assign t_empty_today = "Geen afspraken vandaag" %}
+  {% assign t_empty = "Niets gepland" %}
+  {% assign t_setup = "Kies een CalDAV-agenda in de plugin-instellingen." %}
+{% when "de" %}
+  {% assign i18n_days = "Sonntag,Montag,Dienstag,Mittwoch,Donnerstag,Freitag,Samstag" %}
+  {% assign i18n_days_short = "So,Mo,Di,Mi,Do,Fr,Sa" %}
+  {% assign i18n_months = "Januar,Februar,März,April,Mai,Juni,Juli,August,September,Oktober,November,Dezember" %}
+  {% assign i18n_months_short = "Jan,Feb,Mär,Apr,Mai,Jun,Jul,Aug,Sep,Okt,Nov,Dez" %}
+  {% assign t_today = "Heute" %}
+  {% assign t_tomorrow = "Morgen" %}
+  {% assign t_all_day = "Ganztägig" %}
+  {% assign t_empty_today = "Heute keine Termine" %}
+  {% assign t_empty = "Nichts geplant" %}
+  {% assign t_setup = "Wähle einen CalDAV-Kalender in den Plugin-Einstellungen." %}
+{% when "fr" %}
+  {% assign i18n_days = "dimanche,lundi,mardi,mercredi,jeudi,vendredi,samedi" %}
+  {% assign i18n_days_short = "dim,lun,mar,mer,jeu,ven,sam" %}
+  {% assign i18n_months = "janvier,février,mars,avril,mai,juin,juillet,août,septembre,octobre,novembre,décembre" %}
+  {% assign i18n_months_short = "janv,févr,mars,avr,mai,juin,juil,août,sept,oct,nov,déc" %}
+  {% assign t_today = "Aujourd'hui" %}
+  {% assign t_tomorrow = "Demain" %}
+  {% assign t_all_day = "Toute la journée" %}
+  {% assign t_empty_today = "Aucun rendez-vous aujourd'hui" %}
+  {% assign t_empty = "Rien de prévu" %}
+  {% assign t_setup = "Choisissez un calendrier CalDAV dans les réglages du plugin." %}
+{% when "es" %}
+  {% assign i18n_days = "domingo,lunes,martes,miércoles,jueves,viernes,sábado" %}
+  {% assign i18n_days_short = "dom,lun,mar,mié,jue,vie,sáb" %}
+  {% assign i18n_months = "enero,febrero,marzo,abril,mayo,junio,julio,agosto,septiembre,octubre,noviembre,diciembre" %}
+  {% assign i18n_months_short = "ene,feb,mar,abr,may,jun,jul,ago,sept,oct,nov,dic" %}
+  {% assign t_today = "Hoy" %}
+  {% assign t_tomorrow = "Mañana" %}
+  {% assign t_all_day = "Todo el día" %}
+  {% assign t_empty_today = "Hoy no hay citas" %}
+  {% assign t_empty = "Nada planeado" %}
+  {% assign t_setup = "Elige un calendario CalDAV en los ajustes del plugin." %}
+{% when "it" %}
+  {% assign i18n_days = "domenica,lunedì,martedì,mercoledì,giovedì,venerdì,sabato" %}
+  {% assign i18n_days_short = "dom,lun,mar,mer,gio,ven,sab" %}
+  {% assign i18n_months = "gennaio,febbraio,marzo,aprile,maggio,giugno,luglio,agosto,settembre,ottobre,novembre,dicembre" %}
+  {% assign i18n_months_short = "gen,feb,mar,apr,mag,giu,lug,ago,set,ott,nov,dic" %}
+  {% assign t_today = "Oggi" %}
+  {% assign t_tomorrow = "Domani" %}
+  {% assign t_all_day = "Tutto il giorno" %}
+  {% assign t_empty_today = "Nessun appuntamento oggi" %}
+  {% assign t_empty = "Niente in programma" %}
+  {% assign t_setup = "Scegli un calendario CalDAV nelle impostazioni del plugin." %}
+{% when "pt" %}
+  {% assign i18n_days = "domingo,segunda-feira,terça-feira,quarta-feira,quinta-feira,sexta-feira,sábado" %}
+  {% assign i18n_days_short = "dom,seg,ter,qua,qui,sex,sáb" %}
+  {% assign i18n_months = "janeiro,fevereiro,março,abril,maio,junho,julho,agosto,setembro,outubro,novembro,dezembro" %}
+  {% assign i18n_months_short = "jan,fev,mar,abr,mai,jun,jul,ago,set,out,nov,dez" %}
+  {% assign t_today = "Hoje" %}
+  {% assign t_tomorrow = "Amanhã" %}
+  {% assign t_all_day = "Dia inteiro" %}
+  {% assign t_empty_today = "Sem compromissos hoje" %}
+  {% assign t_empty = "Nada agendado" %}
+  {% assign t_setup = "Escolha um calendário CalDAV nas definições do plugin." %}
+{% when "sv" %}
+  {% assign i18n_days = "söndag,måndag,tisdag,onsdag,torsdag,fredag,lördag" %}
+  {% assign i18n_days_short = "sön,mån,tis,ons,tor,fre,lör" %}
+  {% assign i18n_months = "januari,februari,mars,april,maj,juni,juli,augusti,september,oktober,november,december" %}
+  {% assign i18n_months_short = "jan,feb,mar,apr,maj,jun,jul,aug,sep,okt,nov,dec" %}
+  {% assign t_today = "Idag" %}
+  {% assign t_tomorrow = "Imorgon" %}
+  {% assign t_all_day = "Heldag" %}
+  {% assign t_empty_today = "Inga möten idag" %}
+  {% assign t_empty = "Inget planerat" %}
+  {% assign t_setup = "Välj en CalDAV-kalender i pluginens inställningar." %}
+{% when "da" %}
+  {% assign i18n_days = "søndag,mandag,tirsdag,onsdag,torsdag,fredag,lørdag" %}
+  {% assign i18n_days_short = "søn,man,tir,ons,tor,fre,lør" %}
+  {% assign i18n_months = "januar,februar,marts,april,maj,juni,juli,august,september,oktober,november,december" %}
+  {% assign i18n_months_short = "jan,feb,mar,apr,maj,jun,jul,aug,sep,okt,nov,dec" %}
+  {% assign t_today = "I dag" %}
+  {% assign t_tomorrow = "I morgen" %}
+  {% assign t_all_day = "Hele dagen" %}
+  {% assign t_empty_today = "Ingen aftaler i dag" %}
+  {% assign t_empty = "Intet planlagt" %}
+  {% assign t_setup = "Vælg en CalDAV-kalender i pluginets indstillinger." %}
+{% when "nb" %}
+  {% assign i18n_days = "søndag,mandag,tirsdag,onsdag,torsdag,fredag,lørdag" %}
+  {% assign i18n_days_short = "søn,man,tir,ons,tor,fre,lør" %}
+  {% assign i18n_months = "januar,februar,mars,april,mai,juni,juli,august,september,oktober,november,desember" %}
+  {% assign i18n_months_short = "jan,feb,mar,apr,mai,jun,jul,aug,sep,okt,nov,des" %}
+  {% assign t_today = "I dag" %}
+  {% assign t_tomorrow = "I morgen" %}
+  {% assign t_all_day = "Hele dagen" %}
+  {% assign t_empty_today = "Ingen avtaler i dag" %}
+  {% assign t_empty = "Ingenting planlagt" %}
+  {% assign t_setup = "Velg en CalDAV-kalender i innstillingene for pluginen." %}
+{% when "fi" %}
+  {% assign i18n_days = "sunnuntai,maanantai,tiistai,keskiviikko,torstai,perjantai,lauantai" %}
+  {% assign i18n_days_short = "su,ma,ti,ke,to,pe,la" %}
+  {% assign i18n_months = "tammikuu,helmikuu,maaliskuu,huhtikuu,toukokuu,kesäkuu,heinäkuu,elokuu,syyskuu,lokakuu,marraskuu,joulukuu" %}
+  {% assign i18n_months_short = "tammi,helmi,maalis,huhti,touko,kesä,heinä,elo,syys,loka,marras,joulu" %}
+  {% assign t_today = "Tänään" %}
+  {% assign t_tomorrow = "Huomenna" %}
+  {% assign t_all_day = "Koko päivä" %}
+  {% assign t_empty_today = "Ei tapaamisia tänään" %}
+  {% assign t_empty = "Ei suunnitelmia" %}
+  {% assign t_setup = "Valitse CalDAV-kalenteri lisäosan asetuksista." %}
+{% when "pl" %}
+  {% assign i18n_days = "niedziela,poniedziałek,wtorek,środa,czwartek,piątek,sobota" %}
+  {% assign i18n_days_short = "nie,pon,wt,śr,czw,pt,sob" %}
+  {% assign i18n_months = "styczeń,luty,marzec,kwiecień,maj,czerwiec,lipiec,sierpień,wrzesień,październik,listopad,grudzień" %}
+  {% assign i18n_months_short = "sty,lut,mar,kwi,maj,cze,lip,sie,wrz,paź,lis,gru" %}
+  {% assign t_today = "Dzisiaj" %}
+  {% assign t_tomorrow = "Jutro" %}
+  {% assign t_all_day = "Cały dzień" %}
+  {% assign t_empty_today = "Brak spotkań dzisiaj" %}
+  {% assign t_empty = "Nic nie zaplanowano" %}
+  {% assign t_setup = "Wybierz kalendarz CalDAV w ustawieniach wtyczki." %}
+{% else %}
+  {% assign i18n_days = "Sunday,Monday,Tuesday,Wednesday,Thursday,Friday,Saturday" %}
+  {% assign i18n_days_short = "Sun,Mon,Tue,Wed,Thu,Fri,Sat" %}
+  {% assign i18n_months = "January,February,March,April,May,June,July,August,September,October,November,December" %}
+  {% assign i18n_months_short = "Jan,Feb,Mar,Apr,May,Jun,Jul,Aug,Sep,Oct,Nov,Dec" %}
+  {% assign t_today = "Today" %}
+  {% assign t_tomorrow = "Tomorrow" %}
+  {% assign t_all_day = "All day" %}
+  {% assign t_empty_today = "No appointments today" %}
+  {% assign t_empty = "Nothing planned" %}
+  {% assign t_setup = "Select a CalDAV calendar in the plugin settings." %}
+{% endcase %}
+
+{% assign days_full = i18n_days | split: "," %}
+{% assign days_short = i18n_days_short | split: "," %}
+{% assign months_full = i18n_months | split: "," %}
+{% assign months_short = i18n_months_short | split: "," %}
+
+
+{% comment %} ---------- 3. DATE & TIME (local, via utc_offset) ---------- {% endcomment %}
+{% assign now = trmnl.system.timestamp_utc | plus: trmnl.user.utc_offset %}
+{% assign today = now | date: "%Y-%m-%d" %}
+{% assign tomorrow = now | plus: 86400 | date: "%Y-%m-%d" %}
+{% assign now_hm = now | date: "%H:%M" %}
+{% assign year = now | date: "%Y" %}
+{% assign weekday = now | date: "%w" | plus: 0 %}
+{% assign month_idx = now | date: "%-m" | minus: 1 %}
+
+{% assign month_label = months_full[month_idx] | capitalize %}
+{% capture today_label %}{{ days_full[weekday] | capitalize }} {{ now | date: "%-d" }}{% endcapture %}
+
+{% comment %} Week starts on CalDAV's first_day (0 = Sunday … 6 = Saturday) {% endcomment %}
+{% assign days_back = weekday | minus: first_day | plus: 7 | modulo: 7 %}
+{% assign start_ts = days_back | times: -86400 | plus: now %}
+
+{% assign wd_str = "" %}
+{% for i in (0..6) %}
+  {% assign k = first_day | plus: i | modulo: 7 %}
+  {% assign wd_str = wd_str | append: days_short[k] | append: "," %}
+{% endfor %}
+{% assign wd_labels = wd_str | split: "," %}
+
+
+{% comment %}
+---------- 4. CALENDAR DATA ----------
+days   : 20 rows  "YYYY-MM-DD|day|weekday|month_idx|event_count"
+         (7/14 normally, 10/20 on large landscape screens in the full view)
+agenda : ≤3 rows  "YYYY-MM-DD~label~date"  (upcoming days that have events)
+{% endcomment %}
+{% assign day_rows = "" %}
+{% assign agenda_rows = "" %}
+{% assign agenda_n = 0 %}
+{% assign today_count = 0 %}
+
+{% for i in (0..19) %}
+  {% assign ts = i | times: 86400 | plus: start_ts %}
+  {% assign d = ts | date: "%Y-%m-%d" %}
+  {% assign d_num = ts | date: "%-d" %}
+  {% assign d_wd = ts | date: "%w" | plus: 0 %}
+  {% assign d_mi = ts | date: "%-m" | minus: 1 %}
+
+  {% assign n = 0 %}
+  {% for e in cal.events %}
+    {% comment %} Take the date straight from the ISO string: no timezone shifts {% endcomment %}
+    {% if e.all_day %}
+      {% assign s = e.start_full | slice: 0, 10 %}
+      {% assign x = e.end_full | slice: 0, 10 %}
+      {% if d >= s %}{% if d < x or d == s %}{% assign n = n | plus: 1 %}{% endif %}{% endif %}
+    {% else %}
+      {% assign ed = e.date_time | slice: 0, 10 %}
+      {% if ed == d %}{% assign n = n | plus: 1 %}{% endif %}
+    {% endif %}
+  {% endfor %}
+
+  {% assign day_rows = day_rows | append: d | append: "|" | append: d_num | append: "|" | append: d_wd | append: "|" | append: d_mi | append: "|" | append: n | append: ";" %}
+
+  {% if d == today %}{% assign today_count = n %}{% endif %}
+
+  {% if d >= today and n > 0 and agenda_n < 3 %}
+    {% if d == today %}
+      {% assign heading = t_today %}
+    {% elsif d == tomorrow %}
+      {% assign heading = t_tomorrow %}
+    {% else %}
+      {% assign heading = days_full[d_wd] | capitalize %}
+    {% endif %}
+    {% capture heading_date %}{{ d_num }} {{ months_full[d_mi] }}{% endcapture %}
+    {% assign agenda_rows = agenda_rows | append: d | append: "~" | append: heading | append: "~" | append: heading_date | append: ";" %}
+    {% assign agenda_n = agenda_n | plus: 1 %}
+  {% endif %}
+{% endfor %}
+
+{% assign days = day_rows | split: ";" %}
+{% assign wide_count = day_count | divided_by: 7 | times: 10 %}
+{% assign agenda = agenda_rows | split: ";" %}
+
+
+{% comment %} ---------- 5. STYLES (only what the framework doesn't cover) ---------- {% endcomment %}
+{% if font == "google" %}
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Google+Sans+Flex:opsz,wght@6..144,1..1000&display=swap" rel="stylesheet">
+{% endif %}
+
+<style>
+  .pc--google,
+  .pc--google .title,
+  .pc--google .value,
+  .pc--google .label,
+  .pc--google .description { font-family: "Google Sans Flex", sans-serif; }
+
+  /* Day cell: circle that fills its column up to a max size, so it can never overlap
+     its neighbours (portrait, narrow mashup slots, 10-column TRMNL X grid) */
+  .pc-day   { width: 100%; max-width: var(--pc-max, calc(56px * var(--ui-scale, 1))); aspect-ratio: 1 / 1; border-radius: 9999px; display: flex; align-items: center; justify-content: center; }
+  .pc-size--xl { --pc-max: calc(72px * var(--ui-scale, 1)); }
+  .pc-size--md { --pc-max: calc(48px * var(--ui-scale, 1)); }
+  .pc-dots  { min-height: calc(6px * var(--ui-scale, 1)); }
+  .pc-dot   { width: calc(5px * var(--ui-scale, 1)); height: calc(5px * var(--ui-scale, 1)); border-radius: 9999px; }
+
+  /* Wide grid (full view on large landscape screens, e.g. TRMNL X): 10 days per row,
+     weekday shown per cell because rows no longer line up with weeks */
+  .pc-wd, .pc-xtra { display: none !important; }
+  .screen--lg:not(.screen--portrait) .pc-grid--wide .pc-wdrow { display: none !important; }
+  .screen--lg:not(.screen--portrait) .pc-grid--wide .pc-wd    { display: block !important; }
+  .screen--lg:not(.screen--portrait) .pc-grid--wide .pc-xtra  { display: flex !important; }
+  .screen--lg:not(.screen--portrait) .pc-grid--wide .pc-cells { grid-template-columns: repeat(10, minmax(0, 1fr)) !important; }
+
+  /* Thinner meta bar on event items */
+  .pc-event .meta { width: calc(4px * var(--ui-scale, 1)) !important; min-width: calc(4px * var(--ui-scale, 1)) !important; flex: 0 0 auto; }
+
+  /* Narrow grids (quadrant / half vertical in portrait): 2-letter weekday labels */
+  .pc-lbl-short { display: none; }
+  .screen--portrait .pc-grid--narrow .pc-lbl-full  { display: none !important; }
+  .screen--portrait .pc-grid--narrow .pc-lbl-short { display: inline !important; }
+
+  /* Agenda day headings: date after the day name, with a real gap */
+  .pc-dayhead-sub { margin-left: 0.3em; }
+
+  /* A little air between time label, title and description */
+  .pc-event .content > * + * { margin-top: calc(3px * var(--ui-scale, 1)); }
+
+  /* Agenda area takes the remaining height and never overflows the screen */
+  .pc-fill  { flex: 1 1 auto; min-height: 0; overflow: hidden; }
+
+  /* "Today" mode: flow events over 2 columns in landscape */
+  .pc-flow  { column-count: 2; column-gap: calc(24px * var(--ui-scale, 1)); }
+  .pc-flow > * { break-inside: avoid; margin-bottom: calc(14px * var(--ui-scale, 1)); }
+  .screen--portrait .pc-flow { column-count: 1; }
+
+  /* Half horizontal: calendar left, agenda right */
+  .pc-side  { flex: 0 0 50%; min-width: 0; }
+  .pc-vrule { width: 1px; align-self: stretch; }
+  .screen--portrait .pc-side { flex-basis: auto; width: 100%; align-self: stretch; }
+  .screen--portrait .pc-side + .pc-vrule + .pc-fill { align-self: stretch; }
+  .screen--portrait .pc-vrule { display: none; }
+</style>
+
+
+{% comment %} ---------- 6. TEMPLATES ---------- {% endcomment %}
+
+{% comment %} Time "HH:MM" → 24h or 12h depending on CalDAV setting {% endcomment %}
+{% template pc_time %}
+{%- if fmt == "am/pm" and hm != blank -%}
+  {%- unless hm contains "M" -%}
+    {%- assign h = hm | split: ":" | first | plus: 0 -%}
+    {%- assign m = hm | split: ":" | last -%}
+    {%- assign suffix = "am" -%}{%- if h >= 12 -%}{%- assign suffix = "pm" -%}{%- endif -%}
+    {%- assign h = h | modulo: 12 -%}{%- if h == 0 -%}{%- assign h = 12 -%}{%- endif -%}
+    {{- h }}:{{ m }}{{ suffix -}}
+  {%- else -%}{{- hm -}}{%- endunless -%}
+{%- else -%}{{- hm -}}{%- endif -%}
+{% endtemplate %}
+
+
+{% comment %} Header: "September 2026" + optional right-hand label {% endcomment %}
+{% template pc_header %}
+<div class="flex flex--row flex--between flex--center-y w--full">
+  <div class="flex flex--row flex--center-y gap--small">
+    <span class="title {{ cls }}">{{ month }}</span>
+    <span class="title {{ cls }} text--gray-45">{{ year }}</span>
+  </div>
+  {% if aside != blank %}
+  <span class="label text--gray-35 1bit:text--black">{{ aside }}</span>
+  {% endif %}
+</div>
+{% endtemplate %}
+
+
+{% comment %} Week grid with weekday labels, today circle and event dots {% endcomment %}
+{% template pc_grid %}
+{% assign total = count %}
+{% if wide %}{% assign total = wide_count %}{% endif %}
+<div class="flex flex--col gap--xsmall w--full{% if wide %} pc-grid--wide{% endif %}{% if narrow %} pc-grid--narrow{% endif %}">
+  <div class="grid grid--cols-7 w--full pc-wdrow">
+    {% for label in labels %}
+    <div class="flex flex--row flex--center-x w--full">
+      <span class="label label--small 2bit:text--gray-35 4bit:text--gray-35"><span class="pc-lbl-full">{{ label | capitalize }}</span><span class="pc-lbl-short">{{ label | slice: 0, 2 | capitalize }}</span></span>
+    </div>
+    {% endfor %}
+  </div>
+
+  <div class="grid grid--cols-7 gap--xsmall w--full pc-cells">
+    {% for row in days limit: total %}
+      {% assign p = row | split: "|" %}
+      {% assign d = p[0] %}
+      {% assign wd = p[2] | plus: 0 %}
+      {% assign dots = p[4] | plus: 0 %}
+      {% if dots > 4 %}{% assign dots = 4 %}{% endif %}
+
+      <div class="flex flex--col flex--center-x gap--xxsmall{% if forloop.index > count %} pc-xtra{% endif %}">
+        <span class="pc-wd label label--small 2bit:text--gray-35 4bit:text--gray-35">{{ days_short[wd] | capitalize }}</span>
+        {% if d == today %}
+        <div class="pc-day {{ cell_cls }} bg--{{ accent }} 1bit:bg--black 2bit:bg--black 4bit:bg--black">
+          <span class="value {{ num_cls }} text--white">{{ p[1] }}</span>
+        </div>
+        {% elsif d < today %}
+        <div class="pc-day {{ cell_cls }} bg--gray-75">
+          <span class="value {{ num_cls }} text--gray-45">{{ p[1] }}</span>
+        </div>
+        {% else %}
+        <div class="pc-day {{ cell_cls }} bg--gray-75">
+          <span class="value {{ num_cls }}">{{ p[1] }}</span>
+        </div>
+        {% endif %}
+
+        <div class="pc-dots flex flex--row flex--center-x gap--xxsmall">
+          {% if dots > 0 %}
+            {% for k in (1..dots) %}
+            <span class="pc-dot {% if d < today %}bg--gray-50 1bit:bg--black{% else %}bg--black{% endif %}"></span>
+            {% endfor %}
+          {% endif %}
+        </div>
+      </div>
+    {% endfor %}
+  </div>
+</div>
+{% endtemplate %}
+
+
+{% comment %} One event row (framework .item with meta bar) {% endcomment %}
+{% template pc_event %}
+<div class="item pc-event{% if all_day %} item--emphasis-3{% endif %}">
+  <div class="meta"></div>
+  <div class="content">
+    <span class="label label--small 2bit:text--gray-35 4bit:text--gray-35">{% if all_day %}{{ range }}{% else %}{% render "pc_time", hm: event.start, fmt: fmt %}{% if event.end != blank %} – {% render "pc_time", hm: event.end, fmt: fmt %}{% endif %}{% endif %}</span>
+    <span class="title title--small {{ title_cls }}{% if past %} text--gray-50{% endif %}" data-clamp="{{ clamp | default: 2 }}">{{ event.summary }}</span>
+    {% if show_desc and event.description != blank %}
+    <span class="description 2bit:text--gray-35 4bit:text--gray-35" data-clamp="1">{{ event.description }}</span>
+    {% endif %}
+  </div>
+</div>
+{% endtemplate %}
+
+
+{% comment %} All events of one date: all-day first, then timed. `max` caps the number of rows. {% endcomment %}
+{% template pc_day %}
+{% assign max = max | default: 99 %}
+{% assign shown = 0 %}
+<div class="flex flex--col gap--small w--full">
+  {% if heading != blank %}
+  <span class="title {{ head_cls }}">{{ heading }}{% if sub != blank %}<span class="pc-dayhead-sub text--gray-45">{{ sub }}</span>{% endif %}</span>
+  {% endif %}
+
+  <div class="{% if flow %}pc-flow{% else %}flex flex--col gap--medium{% endif %}">
+    {% for event in events %}
+      {% if event.all_day and shown < max %}
+        {% assign s = event.start_full | slice: 0, 10 %}
+        {% assign x = event.end_full | slice: 0, 10 %}
+        {% if date >= s %}{% if date < x or date == s %}
+          {% comment %} CalDAV end dates are exclusive → last day = end - 1 {% endcomment %}
+          {% assign s_ts = s | append: "T12:00:00Z" | date: "%s" | plus: 0 %}
+          {% assign l_ts = x | append: "T12:00:00Z" | date: "%s" | minus: 86400 %}
+          {% if l_ts > s_ts %}
+            {% assign m1 = s_ts | date: "%-m" | minus: 1 %}
+            {% assign m2 = l_ts | date: "%-m" | minus: 1 %}
+            {% capture range %}{{ s_ts | date: "%-d" }} {{ months_short[m1] }} – {{ l_ts | date: "%-d" }} {{ months_short[m2] }}{% endcapture %}
+          {% else %}
+            {% assign range = t_all_day %}
+          {% endif %}
+          {% render "pc_event", event: event, all_day: true, range: range, fmt: fmt, accent: accent, past: false, title_cls: title_cls, clamp: clamp, show_desc: false %}
+          {% assign shown = shown | plus: 1 %}
+        {% endif %}{% endif %}
+      {% endif %}
+    {% endfor %}
+
+    {% for event in events %}
+      {% unless event.all_day %}{% if shown < max %}
+        {% assign ed = event.date_time | slice: 0, 10 %}
+        {% if ed == date %}
+          {% assign past = false %}
+          {% if date == today and event.end != blank %}
+            {% unless event.end contains "M" %}{% if event.end <= now_hm %}{% assign past = true %}{% endif %}{% endunless %}
+          {% endif %}
+          {% render "pc_event", event: event, all_day: false, range: "", fmt: fmt, accent: accent, past: past, title_cls: title_cls, clamp: clamp, show_desc: show_desc %}
+          {% assign shown = shown | plus: 1 %}
+        {% endif %}
+      {% endif %}{% endunless %}
+    {% endfor %}
+  </div>
+</div>
+{% endtemplate %}
+
+
+{% comment %} Agenda block: "today" mode or next days with events {% endcomment %}
+{% template pc_agenda %}
+<div class="pc-fill w--full">
+  {% if mode == "today" %}
+    {% if today_count > 0 %}
+      {% assign a = agenda.first | split: "~" %}
+      {% render "pc_day", events: events, date: today, heading: a[1], sub: a[2], today: today, now_hm: now_hm, fmt: fmt, accent: accent, months_short: months_short, t_all_day: t_all_day, max: max_items, flow: flow, head_cls: head_cls, title_cls: title_cls, clamp: clamp, show_desc: show_desc %}
+    {% else %}
+      {% render "pc_empty", text: t_empty_today %}
+    {% endif %}
+  {% else %}
+    {% if agenda.size > 0 %}
+    <div class="grid {{ cols_cls }} gap--large w--full">
+      {% for row in agenda limit: max_days %}
+        {% assign a = row | split: "~" %}
+        {% render "pc_day", events: events, date: a[0], heading: a[1], sub: a[2], today: today, now_hm: now_hm, fmt: fmt, accent: accent, months_short: months_short, t_all_day: t_all_day, max: max_items, flow: false, head_cls: head_cls, title_cls: title_cls, clamp: clamp, show_desc: show_desc %}
+      {% endfor %}
+    </div>
+    {% else %}
+      {% render "pc_empty", text: t_empty %}
+    {% endif %}
+  {% endif %}
+</div>
+{% endtemplate %}
+
+
+{% comment %} Centered message (empty state / setup hint) {% endcomment %}
+{% template pc_empty %}
+<div class="flex flex--col flex--center-x flex--center-y w--full h--full">
+  <span class="title title--small text--center text--gray-35">{{ text }}</span>
+</div>
+{% endtemplate %}
