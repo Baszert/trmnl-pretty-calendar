@@ -4,7 +4,7 @@ no_screen_padding: 'no'
 dark_mode: 'no'
 static_data: ''
 polling_verb: get
-framework_version: 3.3.2
+framework_version: latest
 serverless_language: node
 polling_url: https://usetrmnl.com/api/plugin_settings/{{caldav_id}}/data
 polling_headers: authorization=bearer {{user_token}}
