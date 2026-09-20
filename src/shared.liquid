@@ -408,7 +408,7 @@ agenda : ≤3 rows  "YYYY-MM-DD~label~date"  (upcoming days that have events)
 {% comment %} One event row (framework .item with meta bar) {% endcomment %}
 {% template pc_event %}
 {% if all_day %}
-<div class="pc-allday bg--gray-75 w--full">
+<div class="pc-allday bg--gray-75 lg:bg--gray-70 w--full">
   <span class="title title--small {{ title_cls }}" data-clamp="{{ clamp | default: 3 }}">{{ event.summary }}</span>
   {% if range != blank %}
   <span class="text--small lg:text--base 2bit:text--gray-35 4bit:text--gray-35">{{ range }}</span>
