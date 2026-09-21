@@ -36,6 +36,7 @@ custom_fields:
   name: About This Plugin
   description: For this plugin you need to have the <a href="https://usetrmnl.com/plugin_settings/new?keyname=caldav">CalDav</a> calendar plugin active and in a playlist. You can hide it so you only see this one. Select an active CalDav calendar and it's pretty. Works on black &amp; white, grayscale and color screens.
   category: calendar
+  email_address: trmnl@achtnegen.nl
 - keyname: calendar_source
   field_type: plugin_instance_select
   name: Calendar Source
